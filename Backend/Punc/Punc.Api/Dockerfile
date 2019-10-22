@@ -3,4 +3,4 @@ RUN apt-get update -y && apt-get upgrade -y
 EXPOSE 80
 COPY /out .
 RUN ls
-ENTRYPOINT ["dotnet","Punc.Api"]
+ENTRYPOINT ["dotnet","Punc.Api.dll"]
