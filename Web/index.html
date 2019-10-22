@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+    <title>NowLeave - Time Management for the Perpetually Late</title>
+</head>
+<body>
+    <header id="main-header">
+        <div id="header-content">
+            <div id="logo-container" class="center-content">
+                NowLeave
+            </div>
+        </div>
+    </header>
+    <div id="page-body">
+        <h1>Time Management for the Perpetually Late</h1>
+        <form id="widget-container" data-punc-widget class="timer-active">
+            <input type="text" style="display:none; visibility: hidden;">
+            <div id="widget-pages">
+                <section class="form-page">
+                    <div class="input-group">
+                        <label for="location-input">Where are you?</label>
+                        <div class="input-row-multi">
+                            <input id="location-input" class="input-row-item" type="text" name="current-location" placeholder="123 Winlane Ave" autocomplete="off" 
+                                data-punc-addressbox="acl" />
+                            <span class="input-row-item s center-content addon-icon-button" data-punc-gpslocator="location-input">
+                                <img src="images/gps.svg">
+                            </span>
+                            <div class="autocomplete-container" data-punc-addressbox-ac="acl">
+                                <ul></ul>
+                            </div>
+                        </div>
+                    
+                    </div>
+    
+                    <div class="input-group">
+                        <label for="destination-input">Where do you need to be?</label>
+                        <div class="input-row-multi">
+                            <input id="destination-input" class="input-row-item" type="text" name="destination" placeholder="321 Winster Street" data-punc-addressbox="acd" autocomplete="off" />
+                            <div class="autocomplete-container" data-punc-addressbox-ac="acd">
+                                <ul></ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="arrival-time">What time do you need to be there?</label>
+                        <div class="input-row-multi">
+                            <select class="input-row-item m" name="" id="arrival-hour">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="0">12</option>
+                            </select>
+                            <select class="input-row-item m" name="" id="arrival-minute">
+                                <option value="00">00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
+                            <select class="input-row-item m" name="" id="arrival-period">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>How are you getting there?</label>
+                        <div class="input-radio-bar">
+                            <span class="radio-button">
+                                <input type="radio" name="transport-mode" id="transport-mode-walk" value="walking">
+                                <label class="center-content" for="transport-mode-walk"><img src="images/walk.svg" alt="walk"></label>
+                            </span>
+                            <span class="radio-button">
+                                <input type="radio" name="transport-mode" id="transport-mode-cycle" value="bicycling">
+                                <label class="center-content" for="transport-mode-cycle"><img src="images/cycle.svg" alt="cycle"></label></span>
+                            <span class="radio-button">
+                                <input type="radio" name="transport-mode" id="transport-mode-public" value="transit">
+                                <label class="center-content" for="transport-mode-public"><img src="images/transit.svg" alt="Public transport"></label></span>
+                            <span class="radio-button">
+                                <input type="radio" name="transport-mode" id="transport-mode-drive" value="driving" checked="checked">                    
+                                <label class="center-content" for="transport-mode-drive"><img src="images/drive.svg" alt="car"></label>
+                            </span>
+                        </div>
+                    </div>
+    
+                
+    
+                    <div class="input-group">
+                        <label>EXPERT MODE <span class="info-icon"></span></label>
+                        <div class="input-row-multi">
+                            <span class="input-row-item m radio-button">
+                                <input type="radio" name="expert-mode" id="expert-mode-disabled" value="false" checked="checked">
+                                <label class="l" for="expert-mode-disabled">Disable</label></span>
+                            <span class="input-row-item m radio-button">
+                                <input type="radio" name="expert-mode" id="expert-mode-enabled" value="true">                    
+                                <label class="l danger" for="expert-mode-enabled">ENABLE</label>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+                <section class="form-page">
+                    <div class="top-bar">
+                        <div id="form-pageback-button" class="topbar-button">
+                            <div class="button-icon center-content"><img src="images/back.svg" alt="BACK"></div>
+                            BACK
+                        </div>
+                    </div>
+                    <div class="input-group" id="payment-container">
+                        <div class="input-group">
+                            <label for="customer-name">Name</label>
+                            <div class="input-row-multi">
+                                <input id="customer-name" type="text" class="input-row-item" placeholder="John Doe">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="customer-email">E-Mail</label>
+                            <div class="input-row-multi">
+                                <input id="customer-email" type="text" class="input-row-item" placeholder="jdoe@acmecorp.com">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="">Card Details</label>
+                            <div id="stripe-container"></div>
+                        </div>
+                        
+                    </div>
+    
+                    <div class="input-group">
+                        <label>Ontime Confirmation Method<span class="info-icon"></span></label>
+                        <div class="input-row-multi">
+                            <span class="input-row-item m radio-button">
+                                <input type="radio" name="confirmation-method" id="confirmation-method-gps" value="Gps" checked="checked">
+                                <label class="l" for="confirmation-method-gps">GPS Location</label>
+                            </span>
+                            <span class="input-row-item m radio-button">
+                                <input type="radio" name="confirmation-method" id="confirmation-method-email" value="LinkConfirmation">                    
+                                <label class="l" for="confirmation-method-email">E-Mail Referee</label>
+                            </span>
+                        </div>
+                    </div>
+    
+                    <div id="referee-email-container" class="input-group">
+                        <label for="referee-email">Referee Email</label>
+                        <div class="input-row-multi">
+                            <input id="referee-email" class="input-row-item" type="email" placeholder="referee@judge.com">
+                        </div>
+                    </div>
+                </section>
+                <section class="form-page center-content">
+                    <div class="loading-icon-container">
+                        <div class="loading-icon">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        GENERATING TIMER...
+                    </div>
+                </section>
+            </div>
+            <div class="bottom-bar">
+                <div id="error-container" class="input-group">
+                </div>
+                <div class="input-group">
+                    <button id="start-button" type="submit">START</button>
+                </div>
+            </div>
+            <div id="timer-container">
+                <h3>Leave In</h3>
+                <div id="leave-time-container">
+                    - Minutes
+                </div>
+                
+                <h4>Journey Information</h4>
+                <div class="timer-infobar">
+                    <span class="info-box">
+                        <div class="info-box-icon center-content">
+                            <img src="images/takeoff.svg" alt="Depature Time">
+                        </div>
+                        <div id="departure-time" class="info-box-text">
+                            -
+                        </div>
+                    </span>
+                    <span class="info-box">
+                        <div class="info-box-icon center-content">
+                            <img src="images/landing.svg" alt="Arrival Time">
+                        </div>
+                        <div id="arrival-time" class="info-box-text">
+                            -
+                        </div>
+                    </span>
+                    <span class="info-box">
+                        <div class="info-box-icon center-content">
+                            <img class="info-box-icon" src="images/hourglass.svg" alt="Duration"> 
+                        </div>
+                        <div id="journey-duration" class="info-box-text">
+                        -
+                        </div>
+                    </span>
+                </div>
+                
+                <div class="timer-bottombar">
+                    <span class="bottombar-icon center-content">
+                        <img src="images/gps.svg" alt="">
+                    </span>
+                </div>
+                <div class="timer-subscribe">
+                    <h4>Subscribe for updates</h4>
+                    <p>The real NowLeave is coming soon (under a different name). 
+                        To be the first to know when we launch, please subscribe below
+                    </p>
+                    <div class="input-group">
+                        <label for="subscribe-email">Email</label>
+                        <div class="input-row-multi">
+                            <input id="subscribe-email" class="input-row-item" type="text" name="email" placeholder="E.g. jdoe@example.com"/>
+                            <input type="button" value="Subscribe" class="addon-button input-row-item">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+    <footer id="page-footer">
+        nowleave.com is a project owned and operated by <a href="https://www.muljin.sg" target="_blank">Muljin Pte. Ltd.</a>
+        <br><br>
+        <div>Developed by <a href="https://www.moodio.co.uk?utm_source=nowleave" target="_blank"><img class="page-footer-bymoodio" src="/images/bymoodioicon.svg" alt="moodio.co.uk" ></a></div>
+    </footer>
+    <script type="text/javascript" src="scripts/punc-gpslocator.js" async="true"></script>
+    <script type="text/javascript" src="scripts/punc-autocomplete.js" async="true"></script>
+    <script type="text/javascript" src="scripts/punc-core.js" async="true"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeGabIUAAAAAEThhGHi7_NZYL_cEg1A4fRBSeXH"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+</body>
+</html>

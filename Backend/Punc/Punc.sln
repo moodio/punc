@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Punc.Api", "Punc.Api\Punc.Api.csproj", "{EE4A4E94-8F33-48F0-B926-C5DDC5430A5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Punc.Common", "Punc.Common\Punc.Common.csproj", "{AA202113-6E9B-498E-A1C8-2BFB60C19A0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Punc.Core", "Punc.Core\Punc.Core.csproj", "{21E2CBDC-E697-4C9B-A05C-40B0F88BBD1D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE4A4E94-8F33-48F0-B926-C5DDC5430A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE4A4E94-8F33-48F0-B926-C5DDC5430A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE4A4E94-8F33-48F0-B926-C5DDC5430A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE4A4E94-8F33-48F0-B926-C5DDC5430A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA202113-6E9B-498E-A1C8-2BFB60C19A0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA202113-6E9B-498E-A1C8-2BFB60C19A0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA202113-6E9B-498E-A1C8-2BFB60C19A0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA202113-6E9B-498E-A1C8-2BFB60C19A0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21E2CBDC-E697-4C9B-A05C-40B0F88BBD1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21E2CBDC-E697-4C9B-A05C-40B0F88BBD1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21E2CBDC-E697-4C9B-A05C-40B0F88BBD1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21E2CBDC-E697-4C9B-A05C-40B0F88BBD1D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {503E12B5-8CBD-43CC-A604-A7ED06709039}
+	EndGlobalSection
+EndGlobal
