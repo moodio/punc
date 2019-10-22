@@ -1,0 +1,48 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+    - develop
+  paths:
+    include:
+    - Backend
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: NowLeaveAWS
+  - name: buildConfiguration 
+    value: 'Release'
+  - name: containerRepository
+    value: 062126059624.dkr.ecr.us-east-1.amazonaws.com
+  - name: imageName
+    value: nowleave-api
+  - name: projectDirectory
+    value: 'Backend/Punc/Punc.Api'
+  - name: imageVersionTag
+    value: $(containerRepository)/$(imageName):$(Build.BuildNumber)
+  - name: imageLatestTag
+    value: $(containerRepository)/$(imageName)/$(Build.SourceBranchName):latest
+steps:
+- script: dotnet publish --configuration $(buildConfiguration) -o out
+  displayName: 'dotnet publish $(buildConfiguration)'
+  workingDirectory: $(Build.Repository.LocalPath)/$(projectDirectory)
+- script: docker build -t $(imageVersionTag) -t $(imageLatestTag) .
+  displayName: docker build
+  workingDirectory: $(Build.Repository.LocalPath)/$(projectDirectory)
+- task: ECRPushImage@1
+  inputs:
+    awsCredentials: 'AWS-ECR'
+    regionName: 'us-east-1'
+    imageSource: 'imagename'
+    sourceImageName: '$(containerRepository)/$(imageName)'
+    sourceImageTag: '$(Build.BuildNumber)'
+    repositoryName: '$(containerRepository)/$(imageName)'
+    pushTag: '$(Build.BuildNumber)'
+
