@@ -45,4 +45,13 @@ steps:
     sourceImageTag: '$(Build.BuildNumber)'
     repositoryName: '$(imageName)'
     pushTag: '$(Build.BuildNumber)'
+- task: ECRPushImage@1
+  inputs:
+    awsCredentials: 'AWS-ECR'
+    regionName: 'us-east-1'
+    imageSource: 'imagename'
+    sourceImageName: '$(imageName)'
+    sourceImageTag: '$(Build.SourceBranchName):latest'
+    repositoryName: '$(imageName)'
+    pushTag: '$(Build.SourceBranchName):latest'
 
