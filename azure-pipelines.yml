@@ -26,9 +26,9 @@ variables:
   - name: projectDirectory
     value: 'Backend/Punc/Punc.Api'
   - name: imageVersionTag
-    value: $(containerRepository)/$(imageName):$(Build.BuildNumber)
+    value: $(imageName):$(Build.BuildNumber)
   - name: imageLatestTag
-    value: $(containerRepository)/$(imageName)/$(Build.SourceBranchName):latest
+    value: $(imageName)/$(Build.SourceBranchName):latest
 steps:
 - script: dotnet publish --configuration $(buildConfiguration) -o out
   displayName: 'dotnet publish $(buildConfiguration)'
@@ -41,8 +41,8 @@ steps:
     awsCredentials: 'AWS-ECR'
     regionName: 'us-east-1'
     imageSource: 'imagename'
-    sourceImageName: '$(containerRepository)/$(imageName)'
+    sourceImageName: '$(imageName)'
     sourceImageTag: '$(Build.BuildNumber)'
-    repositoryName: '$(containerRepository)/$(imageName)'
+    repositoryName: '$(imageName)'
     pushTag: '$(Build.BuildNumber)'
 
