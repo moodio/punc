@@ -14,7 +14,8 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-moodio.punc.apiHost = "http://api.nowleave.com";
+// moodio.punc.apiHost = "http://api.nowleave.com";
+moodio.punc.apiHost = "https://localhost:5001";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
 moodio.punc.recaptchaSiteId = "6LeGabIUAAAAAEThhGHi7_NZYL_cEg1A4fRBSeXH";
@@ -140,8 +141,9 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     
     PuncCore.prototype.loadTimer = function(timerId)
     {
-        var url = moodio.punc.apiHost + moodio.punc.startTimer + '/' + timerId;
+        this.setStatus(true);
 
+        var url = moodio.punc.apiHost + moodio.punc.startTimer + '/' + timerId;
         var me = this;
 
         var req = new XMLHttpRequest();
@@ -151,9 +153,12 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
                 if(req.status === 200){
                     console.log("got the timer id");
                     this.submitRequestCallback(req);
+                } else if(req.status === 404)
+                {
+                    this.resetAll();
                 }else{
                     console.error("failed to load timer with given id");
-                    this.loadStripe();
+                    this.resetAll();
                 }
             }
         }.bind(me);
@@ -163,8 +168,21 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         req.send();
     }
 
+    PuncCore.prototype.resetAll = function(){
+
+        window.history.pushState(null, '', window.location.pathname);
+        this.setStatus(false);
+        this.setPage(1);
+        this.loadStripe();
+    }
+
     // load the stripe element
-    PuncCore.prototype.loadStripe = function(){
+    PuncCore.prototype.loadStripe = function()
+    {
+        if(this.stripe != null){
+            return;
+        }
+
         //stripe
         this.stripe = Stripe(moodio.punc.stripeKey);
 
@@ -643,11 +661,12 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     // Cancelled
     // Failed
 
-    PuncCore.prototype.setTimerStatus = function(status)
+    PuncCore.prototype.setTimerState = function(status)
     {
-        if(this.state === state){
+        if(this.state === status){
             return;
         }
+        this.state = status;
 
         //all state currently does is change the classname of body
         var classname = "";
