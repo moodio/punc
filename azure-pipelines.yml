@@ -49,7 +49,7 @@ steps:
     regionName: 'us-east-1'
     imageSource: 'imagename'
     sourceImageName: '$(imageName)'
-    sourceImageTag: $(Build.BuildNumber)'
+    sourceImageTag: '$(Build.BuildNumber)'
     repositoryName: '$(imageName)'
     pushTag: 'latest'
 
