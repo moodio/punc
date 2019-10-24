@@ -40,7 +40,7 @@ namespace Punc
         /// <summary>
         /// How long before departure time in seconds is it considered time to leave
         /// </summary>
-        private static int TimeToLeaveBuffer = 300;
+        private static TimeSpan leaveTimeBuffer = TimeSpan.FromMinutes(5);
 
         /// <summary>
         /// id of the timer
@@ -138,17 +138,15 @@ namespace Punc
             //only update if currently within an active state
             if ((int)_status < 16)
             {
-                var timeNowEpoch = DateTime.UtcNow.ToUnixEpoch();
-
-                if (this.ArrivalTimeEpoch < timeNowEpoch)
+                if (this.ArrivalTimeUtc < DateTime.UtcNow)
                 {
                     _status = TimerStatus.AwaitingConfirmation;
                 }
-                else if (this.DepartureTimeEpoch < timeNowEpoch)
+                else if (DateTimeExtensions.UnixEpochToDateTimeUtc(this.DepartureTimeEpoch) < DateTime.UtcNow)
                 {
                     _status = TimerStatus.Enroute;
                 }
-                else if ((this.DepartureTimeEpoch - TimeToLeaveBuffer) < timeNowEpoch)
+                else if (DateTimeExtensions.UnixEpochToDateTimeUtc(this.DepartureTimeEpoch) - leaveTimeBuffer < DateTime.UtcNow)
                 {
                     _status = TimerStatus.TimeToLeave;
                 }

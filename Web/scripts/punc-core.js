@@ -559,16 +559,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
             //set the timer
             this.timer = res;
-
-            //start correct timer
-            if((this.timer.departureTimeEpoch - Math.floor((new Date().getTime())/1000)) > 0){
-                this.startTimer(res);
-            }else if((this.timer.arrivalTimeEpoch - Math.floor((new Date().getTime())/1000)) > 0){
-                this.startJourneyTimer();
-            }else{
-                this.checkFinalStatus();
-            }
-            
+            this.setTimerState();     
         }else{
             this.setStatus(false);
             this.setPage(1);
@@ -578,7 +569,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
 
     /// Start the timer
-    PuncCore.prototype.startTimer = function(timer)
+    PuncCore.prototype.startLeaveTimer = function(timer)
     {
 
         this.elements["form"].className = this.elements["form"].className + " timer-active";
@@ -590,109 +581,117 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
         this.elements["journey-origin"].textContent = timer.location;
         this.elements["journey-destination"].textContent = timer.destination;
-
-
-        // //initial update of time remaining
-        // this.updateTimeRemaining();
         
         //set interval to continue updating timer
         var me = this;
-        this.updateTimer = window.setInterval(this.updateTimeRemaining.bind(me),1000);
+        this.updateTimer = window.setInterval(this.updateLeaveTimer.bind(me),1000);
+
+        //TODO: If expert mode, reload timer at set intervals
     }
 
-    PuncCore.prototype.updateTimeRemaining = function()
+    PuncCore.prototype.updateLeaveTimer = function()
     {
         var secsRemaining = this.timer.departureTimeEpoch - Math.floor((new Date().getTime())/1000);
-        
-        if(secsRemaining <= 0){
+
+        if(secsRemaining <= 0 
+            || (secsRemaining < 300 && this.timer.Status == "Active")){
             //clear timer
             window.clearInterval(this.updateTimer);
-            //start journey
-            this.startJourneyTimer();
-        }else{
-            if(secsRemaining < 300){
-                this.setState("almost");
-            }
-            this.elements["timer-container"].textContent = formatTimeRemaingStopwatch(secsRemaining);
+            //update the timer and status
+            this.loadTimer(this.timer.id);
         }
-
+        else{
+            this.updateTimerWidget(secsRemaining);
+        }
     }
 
     PuncCore.prototype.startJourneyTimer = function()
     {
         console.log("starting journey");
-        this.setState("enroute");
 
         var me = this;
-        this.updateTimer = window.setInterval(this.updateTimeRemaining.bind(me),1000);
+        this.updateTimer = window.setInterval(this.updateTimer.bind(me),1000);
     }
 
-    PuncCore.prototype.updateJourneyTimeRemaining = function()
+    PuncCore.prototype.updateJourneyTimer = function()
     {
         var secsRemaining = this.timer.arrivalTimeEpoch - Math.floor((new Date().getTime())/1000);
 
         if(secsRemaining <= 0){
             //update final status
             window.clearInterval(this.updateTimer);
-            this.checkFinalStatus();
+            this.loadTimer(this.timer.id);
         }else{
-            this.elements["timer-container"].textContent = formatTimeRemaingStopwatch(secsRemaining);
+            this.updateTimerWidget(secsRemaining);
         }
     }
 
-    PuncCore.prototype.checkFinalStatus = function()
+    PuncCore.prototype.startAwaitConfirmation = function()
     {
-        //download status from server
-        this.setState("arrived");
-        // this.loadTimer(this.timer.id);
+        var me = that;
+        this.updateTimer = window.setInterval(function(){this.loadTimer(this.timer.id);}.bind(me),1000);
     }
 
-    //update state of timer
+    //update status of timer
     // possible states are:
     // Active
     // TimeToLeave
+    // Enroute
     // AwaitingConfirmation
     // OnTime
     // Late
     // Cancelled
     // Failed
 
-    PuncCore.prototype.setState = function(status)
+    PuncCore.prototype.setTimerStatus = function(status)
     {
         if(this.state === state){
-            console.log("states the same");
             return;
         }
 
-        
         //all state currently does is change the classname of body
         var classname = "";
         var title = "";
-        switch(state){
-            case "active":
-                classname = "";
-                title = "Leave In";
-            case "almost":
-                classname = "almost";
-                title = "Leave soon";
+        switch(status){
+            case "Active":
+                className = "active";
+                title = "Leave By";
+                this.startLeaveTimer();
                 break;
-            case "enroute":
+            case "TimeToLeave":
+                classname = "almost";
+                title = "Leave By";
+                break;
+            case "Enroute":
                 classname = "enroute";
                 title = "Arrive by";
+                this.startJourneyTimer();
                 break;
-            case "late":
+            case "AwaitingConfirmation":
+                break;
+                classname = "";
+                title = "Leave Before";
+                this.startAwaitConfirmation();
+                break;
+            case "OnTime":
+                classname = "ontime";
+                title = "You made it";
+                break;
+            case "Late":
                 classname = "late";
                 title = "Late by";
                 break;
-            case "arrived":
-                classname = "ontime";
-                title = "You made it!";
+            default:
                 break;
         }
 
         this.elements["body"].className = classname;
         this.elements["timer-title"].textContent = title;
         
+    }
+
+    PuncCore.prototype.updateTimerWidget = function(seconds){
+        this.elements["timer-container"].textContent = formatTimeRemaingStopwatch(seconds);
     }
 
     // display an error to the user

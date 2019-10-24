@@ -49,7 +49,7 @@ namespace Punc.Api.ViewModels
                 {
                     res.Add(new ValidationResult("Expert mode requires payment and confirmation!"));
                 }
-
+                
                 if(this.ConfirmationMethod == TimerConfirmationMethod.LinkConfirmation)
                 {
                     if (String.IsNullOrEmpty(this.RefereeEmail))
