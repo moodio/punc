@@ -41,7 +41,7 @@ namespace Punc.Api.Controllers
             var timer = await _timersService.CreateTimerAsync(req);
 
             //return result based on status
-            if(timer.Status == TimerStatus.Active)
+            if(timer.Status != TimerStatus.Failed)
             {
                 return new OkObjectResult(timer);
             }

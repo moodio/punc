@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Punc
 {
     public enum TimerStatus
     {
+        None = 0,
         Active = 1,
-        AwaitingConfirmation = 2,
-        Ontime = 4,
-        Late = 8,
-        Cancelled = 64,
-        Failed = 128
+        TimeToLeave = 2,
+        Enroute = 4,
+        AwaitingConfirmation = 16,
+        OnTime = 32,
+        Late = 64,
+        Cancelled = 128,
+        Failed = 256
     }
 
     [Flags]
@@ -34,12 +38,21 @@ namespace Punc
     public class Timer
     {
         /// <summary>
+        /// How long before departure time in seconds is it considered time to leave
+        /// </summary>
+        private static int TimeToLeaveBuffer = 300;
+
+        /// <summary>
         /// id of the timer
         /// </summary>
         public Guid Id { get; set; }
 
-        public TimerStatus Status { get; set; }
-        
+        public TimerStatus Status
+        {
+            get => GetStatus();
+            set => _status = value;
+        }
+
         /// <summary>
         /// time required to at destination unix epoch utc time
         /// </summary>
@@ -115,5 +128,37 @@ namespace Punc
         /// List of errors if timer has failed
         /// </summary>
         public TimerErrors Errors { get; set; } = TimerErrors.None;
+
+
+
+        private TimerStatus _status;
+
+        private TimerStatus GetStatus()
+        {
+            //only update if currently within an active state
+            if ((int)_status < 16)
+            {
+                var timeNowEpoch = DateTime.UtcNow.ToUnixEpoch();
+
+                if (this.ArrivalTimeEpoch < timeNowEpoch)
+                {
+                    _status = TimerStatus.AwaitingConfirmation;
+                }
+                else if (this.DepartureTimeEpoch < timeNowEpoch)
+                {
+                    _status = TimerStatus.Enroute;
+                }
+                else if ((this.DepartureTimeEpoch - TimeToLeaveBuffer) < timeNowEpoch)
+                {
+                    _status = TimerStatus.TimeToLeave;
+                }
+                else
+                {
+                    _status = TimerStatus.Active;
+                }
+            }
+
+            return _status;
+        }
     }
 }

@@ -14,7 +14,7 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-moodio.punc.apiHost = "http://puncapi.muljin.com";
+moodio.punc.apiHost = "http://api.nowleave.com";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
 moodio.punc.recaptchaSiteId = "6LeGabIUAAAAAEThhGHi7_NZYL_cEg1A4fRBSeXH";
@@ -50,6 +50,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         this.elements = {};
 
         this.elements["form"] = formEl;
+        this.elements["body"] = document.querySelector('body');
 
         //get elements
         this.elements["location"] = document.querySelector("[data-punc-addressbox='acl']")
@@ -77,11 +78,19 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         this.elements["page-back"] = document.getElementById("form-pageback-button");
 
         //counter app
-        this.elements["timer-container"] = document.getElementById("leave-time-container");
+        this.elements["timer-container"] = document.getElementById("timer-time-container");
+        this.elements["timer-title"] = document.getElementById("timer-time-title");
         this.elements["departure-time"] = document.getElementById("departure-time");
         this.elements["arrival-time"] = document.getElementById("arrival-time");
         this.elements["journey-duration"] = document.getElementById("journey-duration");
+        this.elements["journey-origin"] = document.getElementById("journey-origin");
+        this.elements["journey-destination"] = document.getElementById("journey-destination");
 
+
+        //set the default state
+        this.state = "active";
+
+        //store for binding
         var me = this;
 
         //attach events to expert mode
@@ -114,10 +123,46 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         //setup timer to 2 hours from now
         this.setDefaultTime();
 
-        //load stripe
-        this.loadStripe();
+
+        //check if should load timer
+        var params = new URLSearchParams(window.location.search);
+        if(params.has('tid')){
+            var tid = params.get('tid');
+            this.loadTimer(tid);
+        }else{
+            console.log("tid doesnt exist");
+            //load stripe
+            this.loadStripe();
+        }
+
+        
     }
     
+    PuncCore.prototype.loadTimer = function(timerId)
+    {
+        var url = moodio.punc.apiHost + moodio.punc.startTimer + '/' + timerId;
+
+        var me = this;
+
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+            if(req.readyState === 4)
+            {
+                if(req.status === 200){
+                    console.log("got the timer id");
+                    this.submitRequestCallback(req);
+                }else{
+                    console.error("failed to load timer with given id");
+                    this.loadStripe();
+                }
+            }
+        }.bind(me);
+
+        req.open("GET",url);
+        req.setRequestHeader("content-type", "application/json");
+        req.send();
+    }
+
     // load the stripe element
     PuncCore.prototype.loadStripe = function(){
         //stripe
@@ -160,9 +205,13 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         
 
         var setPeriod = hour > 11 ? "PM" : "AM";
-        var setHour = hour > 12 ? hour - 12 : hour;
-        var setHour = setHour == 0 ? 12 : setHour;
+        var setHour = hour >= 12 ? hour - 12 : hour;
+        // var setHour = setHour == 12 ? 0 : setHour;
         var setMinute = Math.floor(setTime.getMinutes()/15)*15;
+
+        if(setMinute == 0){
+            setMinute = "00";
+        }
 
         this.elements["arrival-hour"].value = setHour;
         this.elements["arrival-minute"].value = setMinute;
@@ -506,7 +555,20 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         {
             console.log("req status is 200");
             console.dir(this);
-            this.startTimer(res);
+            window.history.pushState(null, '', '?tid='+res.id);
+
+            //set the timer
+            this.timer = res;
+
+            //start correct timer
+            if((this.timer.departureTimeEpoch - Math.floor((new Date().getTime())/1000)) > 0){
+                this.startTimer(res);
+            }else if((this.timer.arrivalTimeEpoch - Math.floor((new Date().getTime())/1000)) > 0){
+                this.startJourneyTimer();
+            }else{
+                this.checkFinalStatus();
+            }
+            
         }else{
             this.setStatus(false);
             this.setPage(1);
@@ -518,7 +580,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     /// Start the timer
     PuncCore.prototype.startTimer = function(timer)
     {
-        this.timer = timer;
+
         this.elements["form"].className = this.elements["form"].className + " timer-active";
 
         //set journey information
@@ -526,8 +588,12 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         this.elements["departure-time"].textContent = this.getTimeFromUnixEpoch(timer.departureTimeEpoch);
         this.elements["arrival-time"].textContent = this.getTimeFromUnixEpoch(timer.estimatedArrivalTimeEpoch);
 
-        //initial update of time remaining
-        this.updateTimeRemaining();
+        this.elements["journey-origin"].textContent = timer.location;
+        this.elements["journey-destination"].textContent = timer.destination;
+
+
+        // //initial update of time remaining
+        // this.updateTimeRemaining();
         
         //set interval to continue updating timer
         var me = this;
@@ -538,22 +604,96 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     {
         var secsRemaining = this.timer.departureTimeEpoch - Math.floor((new Date().getTime())/1000);
         
-        var display = "";
         if(secsRemaining <= 0){
-            display = "YOU'RE LATE!";
-            document.getElementsByTagName("body")[0].className = "late";
+            //clear timer
             window.clearInterval(this.updateTimer);
-        }else if(secsRemaining<60){
-            display = secsRemaining + " Seconds";
-        } else if (secsRemaining < 3600){
-            display = Math.floor(secsRemaining/60) + " Minutes";
+            //start journey
+            this.startJourneyTimer();
         }else{
-            display = Math.floor(secsRemaining/3600) + " Hours";
+            if(secsRemaining < 300){
+                this.setState("almost");
+            }
+            this.elements["timer-container"].textContent = formatTimeRemaingStopwatch(secsRemaining);
         }
 
-        this.elements["timer-container"].textContent = display;
     }
 
+    PuncCore.prototype.startJourneyTimer = function()
+    {
+        console.log("starting journey");
+        this.setState("enroute");
+
+        var me = this;
+        this.updateTimer = window.setInterval(this.updateTimeRemaining.bind(me),1000);
+    }
+
+    PuncCore.prototype.updateJourneyTimeRemaining = function()
+    {
+        var secsRemaining = this.timer.arrivalTimeEpoch - Math.floor((new Date().getTime())/1000);
+
+        if(secsRemaining <= 0){
+            //update final status
+            window.clearInterval(this.updateTimer);
+            this.checkFinalStatus();
+        }else{
+            this.elements["timer-container"].textContent = formatTimeRemaingStopwatch(secsRemaining);
+        }
+    }
+
+    PuncCore.prototype.checkFinalStatus = function()
+    {
+        //download status from server
+        this.setState("arrived");
+        // this.loadTimer(this.timer.id);
+    }
+
+    //update state of timer
+    // possible states are:
+    // Active
+    // TimeToLeave
+    // AwaitingConfirmation
+    // OnTime
+    // Late
+    // Cancelled
+    // Failed
+
+    PuncCore.prototype.setState = function(status)
+    {
+        if(this.state === state){
+            console.log("states the same");
+            return;
+        }
+
+        
+        //all state currently does is change the classname of body
+        var classname = "";
+        var title = "";
+        switch(state){
+            case "active":
+                classname = "";
+                title = "Leave In";
+            case "almost":
+                classname = "almost";
+                title = "Leave soon";
+                break;
+            case "enroute":
+                classname = "enroute";
+                title = "Arrive by";
+                break;
+            case "late":
+                classname = "late";
+                title = "Late by";
+                break;
+            case "arrived":
+                classname = "ontime";
+                title = "You made it!";
+                break;
+        }
+
+        this.elements["body"].className = classname;
+        this.elements["timer-title"].textContent = title;
+        
+    }
 
     // display an error to the user
     PuncCore.prototype.displayError = function(error)
@@ -641,6 +781,34 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
     }
 
+
+    // format time remaining
+    function formatTimeRemaingStopwatch(seconds)
+    {
+        var res = "";
+
+        var hours = Math.floor(seconds/3600);
+        var minutes = Math.floor((seconds - hours*3600)/60);
+        var seconds = Math.floor( seconds - (hours*3600) - (minutes*60));
+
+        if(hours<10){
+            res += "0";
+        }
+        res += hours.toString() + ":";
+
+        if(minutes<10){
+            res += "0";
+        }
+        res += minutes.toString() + ":";
+
+        if(seconds < 10){
+            res += "0";
+        }
+        res += seconds.toString();
+
+        return res;
+
+    }
 
     //Logging
     PuncCore.prototype.log = function(text){

@@ -4,27 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <title>NowLeave - Time Management for the Perpetually Late</title>
 </head>
 <body>
     <header id="main-header">
         <div id="header-content">
             <div id="logo-container" class="center-content">
-                NowLeave
+                ⌚🚶‍♀️
             </div>
         </div>
     </header>
     <div id="page-body">
         <h1>Time Management for the Perpetually Late</h1>
-        <form id="widget-container" data-punc-widget class="timer-active">
+        <form id="widget-container" data-punc-widget class="">
             <input type="text" style="display:none; visibility: hidden;">
             <div id="widget-pages">
                 <section class="form-page">
                     <div class="input-group">
                         <label for="location-input">Where are you?</label>
                         <div class="input-row-multi">
-                            <input id="location-input" class="input-row-item" type="text" name="current-location" placeholder="123 Winlane Ave" autocomplete="off" 
+                            <input id="location-input" class="input-row-item" type="text" name="current-location" placeholder="E.g. 123 Winlane Ave" autocomplete="off" 
                                 data-punc-addressbox="acl" />
                             <span class="input-row-item s center-content addon-icon-button" data-punc-gpslocator="location-input">
                                 <img src="images/gps.svg">
@@ -39,7 +39,7 @@
                     <div class="input-group">
                         <label for="destination-input">Where do you need to be?</label>
                         <div class="input-row-multi">
-                            <input id="destination-input" class="input-row-item" type="text" name="destination" placeholder="321 Winster Street" data-punc-addressbox="acd" autocomplete="off" />
+                            <input id="destination-input" class="input-row-item" type="text" name="destination" placeholder="E.g. 321 Winster Street" data-punc-addressbox="acd" autocomplete="off" />
                             <div class="autocomplete-container" data-punc-addressbox-ac="acd">
                                 <ul></ul>
                             </div>
@@ -99,7 +99,11 @@
                 
     
                     <div class="input-group">
-                        <label>EXPERT MODE <span class="info-icon"></span></label>
+                        <label>EXPERT MODE <span class="info-icon tooltip-trigger">
+                            <div class="tooltip-container stick-left">
+                                Expert mode is our pay to play option. If youre late, we charge you a $3 forfeit!
+                            </div>
+                        </span></label>
                         <div class="input-row-multi">
                             <span class="input-row-item m radio-button">
                                 <input type="radio" name="expert-mode" id="expert-mode-disabled" value="false" checked="checked">
@@ -139,7 +143,12 @@
                     </div>
     
                     <div class="input-group">
-                        <label>Ontime Confirmation Method<span class="info-icon"></span></label>
+                        <label>Ontime Confirmation Method<span class="info-icon tooltip-trigger">
+                            <div class="tooltip-container stick-right">
+                                Select GPS if you want us to check the location of your current device to confirm if you're ontime.<br><br>
+                                Select referee and we will email your chosen third party to confirm if you have arrived on time.
+                            </div>
+                        </span></label>
                         <div class="input-row-multi">
                             <span class="input-row-item m radio-button">
                                 <input type="radio" name="confirmation-method" id="confirmation-method-gps" value="Gps" checked="checked">
@@ -180,42 +189,72 @@
                 </div>
             </div>
             <div id="timer-container">
-                <h3>Leave In</h3>
-                <div id="leave-time-container">
-                    - Minutes
+                <h3 id="timer-time-title">Leave In</h3>
+                <div id="timer-time-container">
+                    00:00:00
                 </div>
                 
                 <h4>Journey Information</h4>
                 <div class="timer-infobar">
                     <span class="info-box">
-                        <div class="info-box-icon center-content">
+                        <div class="info-box-icon center-content tooltip-trigger">
                             <img src="images/takeoff.svg" alt="Depature Time">
+                            <div class="tooltip-container stick-left">
+                                    Departure Time
+                                </div>
                         </div>
                         <div id="departure-time" class="info-box-text">
                             -
                         </div>
                     </span>
                     <span class="info-box">
-                        <div class="info-box-icon center-content">
+                        <div class="info-box-icon center-content tooltip-trigger">
                             <img src="images/landing.svg" alt="Arrival Time">
+                            <div class="tooltip-container stick-left">
+                                Estimated Arrival Time
+                            </div>
                         </div>
                         <div id="arrival-time" class="info-box-text">
                             -
                         </div>
                     </span>
                     <span class="info-box">
-                        <div class="info-box-icon center-content">
+                        <div class="info-box-icon center-content tooltip-trigger">
                             <img class="info-box-icon" src="images/hourglass.svg" alt="Duration"> 
+                            <div class="tooltip-container stick-right">
+                                Duration
+                            </div>
                         </div>
                         <div id="journey-duration" class="info-box-text">
                         -
                         </div>
                     </span>
                 </div>
+                <div class="timer-locations-container">
+                    <div class="location">
+                        <div class="location-header">
+                            Origin
+                        </div>
+                        <div id="journey-origin" class="location-address">
+                            -
+                        </div>
+                    </div>
+                    <div class="location">
+                        <div class="location-header">
+                            Destination
+                        </div>
+                        <div id="journey-destination" class="location-address">
+                            -
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="timer-bottombar">
-                    <span class="bottombar-icon center-content">
+                    <span class="bottombar-icon center-content tooltip-trigger">
                         <img src="images/gps.svg" alt="">
+                        <div class="tooltip-container stick-right">
+                            Update your location.
+                        </div>
                     </span>
                 </div>
                 <div class="timer-subscribe">

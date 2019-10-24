@@ -7,6 +7,7 @@ html{
     
 }
 
+
 body{
     min-height:100%;
     display: flex;
@@ -16,6 +17,23 @@ body{
     align-content: stretch;
     color:#4a4a4a;
     background: fixed linear-gradient(to top, #3b41c5 0%, #a981bb 49%, #ffc8a9 100%) center no-repeat;
+
+    &.almost {
+        background-image: linear-gradient(to top, #007adf 0%, #00ecbc 100%);
+    }
+
+    &.enroute {
+        background-image: linear-gradient(to top, #b3ffab 0%, #12fff7 100%);
+    }
+    &.late{
+        background-image: linear-gradient(to top, #f43b47 0%, #453a94 100%);
+    }
+
+    &>*{
+        flex: 0 0 auto;
+    }
+
+
 }
 
 body > * {
@@ -30,15 +48,11 @@ body, html{
     font-family: Helvetica, Arial, sans-serif;
 }
 
-body.late{
-    background-image: linear-gradient(to top, #f43b47 0%, #453a94 100%);
-}
-
 #page-body{
     flex: 1 0 auto;
 }
 #page-footer{
-    color:#eaeaea;
+    color:#eaeaea;  
     padding:40px;
     font-size:0.9rem;
 }
@@ -118,20 +132,24 @@ body.late{
 }
 
 
-.timer-active #widget-pages{
-    display:none;
-    visibility: hidden;
+.timer-active{
+    #widget-pages{
+        display:none;
+        visibility: hidden;
+    }
+
+    #timer-container{
+        display: block;
+        visibility: visible;
+    }
+
+    .bottom-bar{
+        display: none;
+        visibility: hidden;
+    }
+    
 }
 
-.timer-active #timer-container{
-    display: block;
-    visibility: visible;
-}
-
-.timer-active .bottom-bar{
-    display: none;
-    visibility: hidden;
-}
 
 .form-page{
     flex:0 0 100%;
@@ -198,6 +216,8 @@ h4{
 
 #leave-time-container{
     font-size:3rem;
+    padding-bottom:20px;
+    border-bottom: 1px solid #EAEAEA;
 }
 
 .timer-infobar{
@@ -210,7 +230,15 @@ h4{
 .info-box{
     flex:1 0 auto;
     text-align:left;
+    font-size:0;
 }
+
+.info-box-title{
+    font-size:0.9rem;
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
 .info-box-icon{
     display:inline-block;
     background-color:#595d7b;
@@ -230,8 +258,9 @@ h4{
     display:inline-block;
     vertical-align: middle;
     line-height:28px;
+    padding:0 6px; 
     font-weight: bold;
-    font-size:0.9rem;
+    font-size:0.9rem; 
     color: #786D85;
 }
 
@@ -242,6 +271,8 @@ h4{
     align-content: center;
     flex-flow:row-reverse nowrap;
     font-size:0;
+
+    padding: 20px 0;
 }
 
 .bottombar-icon{
@@ -254,7 +285,34 @@ h4{
     cursor: pointer;
 }
 
+/* journey locations */
+.timer-locations-container
+{
+    font-size:0;
 
+    .location-header{
+        text-align:left; 
+        font-size:0.9rem;
+        font-weight:bold;
+    }
+    
+    .location-address{
+        font-size:0.9rem;
+        font-weight:bold;
+        color:#786D85;
+        text-align:left;
+        padding:4px 0 10px 0; 
+    }
+}
+
+/* subscribe stuff
+*/
+.timer-subscribe{
+    text-align: left;
+    padding:10px 0 20px 0;
+
+    border-top:1px solid #EAEAEA;
+}
 
 /*
  *  Coming soon bits
@@ -315,13 +373,52 @@ h4{
     vertical-align: middle;
 }
 
-/* subscribe stuff
+
+/*
+ * tool tip 
 */
-.timer-subscribe{
+.tooltip-container
+{
+    position:absolute;
+    display:none;
+    visibility: hidden;
+    width:180px;
+    height:auto;
+    bottom:110%;
+
+    padding:10px;
+    color:white;
+    background-color:#393c52;
+    font-size:0.8rem;
+    font-weight:normal;  
     text-align: left;
-    padding:10px 0 20px 0;
+    
+    box-shadow:1px 2px 4px rgba(0,0,0,0.15);
+    border-radius:6px;
+
+    transition: visible 2s; 
+    z-index:500;
+
+    &.stick-right{
+        right:0px;
+    }
+
+    &.stick-left{
+        left:0px;
+    }
 }
 
+.tooltip-trigger{
+    position:relative;
+    &:hover{
+        .tooltip-container{
+            display:inline-block;
+            visibility: visible;
+        }
+    } 
+}
+
+ 
 /*
 *   Input styling
 */
@@ -398,7 +495,7 @@ input[type="email"]--placeholder{
     display:inline-block;
     height:16px;
     width:16px;
-    background: url('images/infoicon.svg');
+    background: url('/images/infoicon.svg');
     background-size: contain;
     background-repeat: no-repeat;
     vertical-align: middle;

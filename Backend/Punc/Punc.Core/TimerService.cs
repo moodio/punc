@@ -98,10 +98,11 @@ namespace Punc
                     timer.DepartureTimeEpoch = routeInfo.DepartureTime;
                     timer.TravelDuration = routeInfo.TravelDuration;
                     timer.TravelDistance = routeInfo.TravelDistance;
-
-                    _cache.Set(id, timer);
-
                 }
+
+
+                //update the cache
+                _cache.Set(id, timer);
 
                 return timer;
             }
