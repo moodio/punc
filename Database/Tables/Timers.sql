@@ -1,3 +1,20 @@
 CREATE TABLE timers(
-
+    id uuid PRIMARY KEY,
+    status int NOT NULL,
+    arrival_time_utc timestamp NOT NULL,
+    confirmation_method int,
+    customer_email text,
+    customer_name text,
+    destination text NOT NULL,
+    departure_time_utc timestamp,
+    estimated_arrival_time_utc timestamp,
+    expert_mode boolean not null,
+    last_update_utc text,
+    origin text not null,
+    referee_email text,
+    travel_mode int,
+    travel_distance int,
+    travel_duration int,
+    payment_intent_id text,
+    errors int
 );

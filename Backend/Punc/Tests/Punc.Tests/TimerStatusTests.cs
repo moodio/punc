@@ -75,7 +75,7 @@ namespace Punc.Tests
 
             var timer2 = new Timer()
             {
-                Status = TimerStatus.Late,
+                Status = TimerStatus.UnconfirmedLate,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(40),
                 DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(3)
             };
@@ -95,7 +95,7 @@ namespace Punc.Tests
             };
 
             Assert.AreEqual(TimerStatus.OnTime, timer1.Status);
-            Assert.AreEqual(TimerStatus.Late, timer2.Status);
+            Assert.AreEqual(TimerStatus.UnconfirmedLate, timer2.Status);
             Assert.AreEqual(TimerStatus.Cancelled, timer3.Status);
             Assert.AreEqual(TimerStatus.Failed, timer4.Status);
 

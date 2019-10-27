@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Punc.Common\Punc.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
 </Project>

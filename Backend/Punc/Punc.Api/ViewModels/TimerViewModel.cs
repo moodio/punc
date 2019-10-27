@@ -107,7 +107,7 @@ namespace Punc.Api.ViewModels
                 ExpertMode = timer.ExpertMode,
                 EstimatedArrivalTimeEpoch = timer.EstimatedArrivalTimeUtc.ToUnixEpoch(),
                 EstimatedArrivalTimeUtc = timer.EstimatedArrivalTimeUtc,
-                LastUpdate = timer.LastUpdate,
+                LastUpdate = timer.LastUpdateUtc,
                 Origin = timer.Origin,
                 Status = timer.Status,
                 TravelMode = timer.TravelMode,

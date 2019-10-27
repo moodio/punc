@@ -14,9 +14,11 @@ namespace Punc
         Enroute = 4,
         AwaitingConfirmation = 16,
         OnTime = 32,
-        Late = 64,
-        Cancelled = 128,
-        Failed = 256
+        ConfirmedLate = 64,
+        UnconfirmedLate = 128,
+        Closed = 512, 
+        Cancelled = 1024,
+        Failed = 2048
     }
 
     [Flags]
@@ -71,11 +73,6 @@ namespace Punc
         public string CustomerName { get; set; }
 
         /// <summary>
-        /// Time of the last update of journey time
-        /// </summary>
-        public DateTime LastUpdate { get; set; }
-
-        /// <summary>
         /// Address of the destiation
         /// </summary>
         public string Destination { get; set; }
@@ -94,6 +91,11 @@ namespace Punc
         /// Bool for if expert mode is selected
         /// </summary>
         public bool ExpertMode { get; set; } = false;
+
+        /// <summary>
+        /// Time of the last update of journey time
+        /// </summary>
+        public DateTime LastUpdateUtc { get; set; }
 
         /// <summary>
         /// Starting location

@@ -54,6 +54,7 @@ namespace Punc.Api
             services.AddScoped<ITimersService, TimersService>();
             services.AddScoped<IConfirmationService, ConfirmationService>();
             services.AddScoped<IEmailService, AwsEmailService>();
+            services.AddPuncServices();
 
         }
 

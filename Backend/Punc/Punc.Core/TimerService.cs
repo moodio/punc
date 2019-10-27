@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Punc.Api.ViewModels;
+using Punc.Data;
 
 namespace Punc
 {
@@ -13,16 +14,17 @@ namespace Punc
         private readonly IConfirmationService _confirmationService;
         private readonly IRouteService _routeService;
         private readonly StripeService _stripeService;
-        IMemoryCache _cache;
+        private readonly ITimersRepository _repository;
 
         public TimersService(
             IConfirmationService confirmationService,
             IRouteService routeService, 
-            StripeService stripeService,
-            IMemoryCache cache)
+            ITimersRepository repository,
+            StripeService stripeService
+            )
         {
-            _cache = cache;
             _confirmationService = confirmationService;
+            _repository = repository;
             _routeService = routeService;
             _stripeService = stripeService;
         }
@@ -59,26 +61,27 @@ namespace Punc
             }
 
             //store timer in memory, expire after 2 days
-            _cache.Set(res.Id, res, TimeSpan.FromDays(2));
-
+            res = await _repository.CreateTimerAsync(res);
+            
             //return timer
             return res;
         }
 
         public async Task<Timer> GetTimerAsync(Guid id)
         {
-            if(_cache.TryGetValue(id, out Timer timer))
+            var timer = await _repository.GetTimerAsync(id);
+            if(timer!=null)
             {
                 //check if timer is ready for an update
                 if(timer.ExpertMode 
                     && timer.Status == TimerStatus.Active
-                    && (DateTime.UtcNow - timer.LastUpdate) > TimeSpan.FromMinutes(15))
+                    && (DateTime.UtcNow - timer.LastUpdateUtc) > TimeSpan.FromMinutes(15))
                 {
                     await GetAndSetRouteInfoAsync(timer);
                 }
 
                 //update the cache
-                _cache.Set(id, timer);
+                await _repository.UpdateTimerAsync(timer);
 
                 return timer;
             }
@@ -185,7 +188,7 @@ namespace Punc
             timer.TravelDistance = routeInfo.TravelDistance;
 
             //set time of last update to now
-            timer.LastUpdate = DateTime.UtcNow;
+            timer.LastUpdateUtc = DateTime.UtcNow;
 
             //return success
             return true;
