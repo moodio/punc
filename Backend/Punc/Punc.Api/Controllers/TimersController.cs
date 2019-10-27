@@ -38,7 +38,7 @@ namespace Punc.Api.Controllers
             }
 
             //create the timer
-            var timer = await _timersService.CreateTimerAsync(req);
+            var timer = (TimerViewModel)(await _timersService.CreateTimerAsync(req));
 
             //return result based on status
             if(timer.Status != TimerStatus.Failed)
@@ -67,7 +67,7 @@ namespace Punc.Api.Controllers
         [HttpGet("{timerId}")]
         public async Task<IActionResult> GetTimer([FromRoute]Guid timerId)
         {
-            var res = await _timersService.GetTimerAsync(timerId);
+            var res = (TimerViewModel)(await _timersService.GetTimerAsync(timerId));
             if (res != null)
             {
                 return new OkObjectResult(res);

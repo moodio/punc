@@ -52,7 +52,9 @@ namespace Punc.Api
             services.AddHttpClient<IRouteService, GoogleMapsDirectionsService>();
             services.AddScoped<StripeService, StripeService>();
             services.AddScoped<ITimersService, TimersService>();
-            
+            services.AddScoped<IConfirmationService, ConfirmationService>();
+            services.AddScoped<IEmailService, AwsEmailService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

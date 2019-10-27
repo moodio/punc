@@ -17,7 +17,7 @@ namespace Punc.Tests
             {
                 Status = TimerStatus.Active,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(40),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(20)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(20)
             };
 
             Assert.AreEqual(TimerStatus.Active, timer.Status);
@@ -31,7 +31,7 @@ namespace Punc.Tests
             {
                 Status = TimerStatus.Active,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(40),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(4)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(4)
             };
 
             Assert.AreEqual(TimerStatus.TimeToLeave, timer.Status);
@@ -44,7 +44,7 @@ namespace Punc.Tests
             {
                 Status = TimerStatus.Active,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(20),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(-4)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-4)
             };
 
             Assert.AreEqual(TimerStatus.Enroute, timer.Status);
@@ -57,7 +57,7 @@ namespace Punc.Tests
             {
                 Status = TimerStatus.Active,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-20),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(-40)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-40)
             };
 
             Assert.AreEqual(TimerStatus.AwaitingConfirmation, timer.Status);
@@ -70,28 +70,28 @@ namespace Punc.Tests
             {
                 Status = TimerStatus.OnTime,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-20),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(-40)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-40)
             };
 
             var timer2 = new Timer()
             {
                 Status = TimerStatus.Late,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(40),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(3)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(3)
             };
 
             var timer3 = new Timer()
             {
                 Status = TimerStatus.Cancelled,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-20),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(-40)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(-40)
             };
 
             var timer4 = new Timer()
             {
                 Status = TimerStatus.Failed,
                 ArrivalTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(40),
-                DepartureTimeEpoch = (DateTime.UtcNow + TimeSpan.FromMinutes(10)).ToUnixEpoch()
+                DepartureTimeUtc = DateTime.UtcNow + TimeSpan.FromMinutes(10)
             };
 
             Assert.AreEqual(TimerStatus.OnTime, timer1.Status);

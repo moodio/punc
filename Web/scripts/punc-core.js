@@ -14,7 +14,7 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-// moodio.punc.apiHost = "http://api.nowleave.com";
+//moodio.punc.apiHost = "http://api.nowleave.com";
 moodio.punc.apiHost = "https://localhost:5001";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
@@ -87,6 +87,9 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         this.elements["journey-origin"] = document.getElementById("journey-origin");
         this.elements["journey-destination"] = document.getElementById("journey-destination");
 
+        //subscribe
+        this.elements["subscribe-email"] = document.getElementById('subscribe-email');
+        this.elements["subscribe-submit"] = document.getElementById('subscribe-submit');
 
         //set the default state
         this.state = "active";
@@ -121,6 +124,9 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
         this.elements["page-back"].addEventListener('click', function(){this.setPage(this.currentPage - 1)}.bind(me));
 
+        //attach elements for subscribe
+        this.elements["subscribe-email"].addEventListener('click', this.subscribe.bind(me));
+
         //setup timer to 2 hours from now
         this.setDefaultTime();
 
@@ -131,7 +137,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
             var tid = params.get('tid');
             this.loadTimer(tid);
         }else{
-            console.log("tid doesnt exist");
+            this.log("tid doesnt exist");
             //load stripe
             this.loadStripe();
         }
@@ -141,7 +147,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     
     PuncCore.prototype.loadTimer = function(timerId)
     {
-        this.setStatus(true);
+        this.setSubmitStatus(true);
 
         var url = moodio.punc.apiHost + moodio.punc.startTimer + '/' + timerId;
         var me = this;
@@ -151,7 +157,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
             if(req.readyState === 4)
             {
                 if(req.status === 200){
-                    console.log("got the timer id");
+                    this.log("got the timer id");
                     this.submitRequestCallback(req);
                 } else if(req.status === 404)
                 {
@@ -171,7 +177,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     PuncCore.prototype.resetAll = function(){
 
         window.history.pushState(null, '', window.location.pathname);
-        this.setStatus(false);
+        this.setSubmitStatus(false);
         this.setPage(1);
         this.loadStripe();
     }
@@ -235,7 +241,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         this.elements["arrival-minute"].value = setMinute;
         this.elements["arrival-period"].value = setPeriod;
 
-        console.log("setting as " + setHour + ":" + setMinute + ":" + setPeriod);
+        this.log("setting as " + setHour + ":" + setMinute + ":" + setPeriod);
 
     }
 
@@ -266,7 +272,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
             return;
         }
 
-        this.setStatus(true);
+        this.setSubmitStatus(true);
         this.setPage(3);
         this.displayError("");
         this.getRecaptchaCode(this.getFormattedStartRequest()); 
@@ -327,18 +333,23 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
         this.currentPage = num;
 
+        //remove other pages
+        var newClassname = this.elements["form"].className.replace(/page[0-9]/i,"").replace("submitting","");
         if(num === 1){
-            this.elements["form"].className = this.elements["form"].className.replace(" page2", "").replace(" page3","");
             this.elements["submit"].textContent = this.expertMode ? "NEXT" : "START";
         } else if(num === 2){
-            this.elements["form"].className = this.elements["form"].className.replace(" page3", "") + " page2";
             this.elements["submit"].textContent = "START";
+            newClassname =  newClassname + " page2";
         } else if(num === 3){
-            this.elements["form"].className = this.elements["form"].className.replace(" page2", "") + " page3";
+            newClassname = newClassname + " page3 submitting";
+        } else if (num === 4){
+            newClassname = newClassname + " timer-active";
         }
+
+        this.elements["form"].className = newClassname;
     }
 
-    PuncCore.prototype.setStatus = function(inflight){
+    PuncCore.prototype.setSubmitStatus = function(inflight){
         
         if(this.inflight === inflight){
             return;
@@ -364,20 +375,20 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     PuncCore.prototype.getFormattedStartRequest = function()
     {
         //set status
-        this.setStatus(true);
+        this.setSubmitStatus(true);
 
         //validate the form
         if(!this.validateForm())
         {
             this.displayError("Please correct the items above.");
-            this.setStatus(false);
+            this.setSubmitStatus(false);
             return;
         }
 
         //return the results
         var res = {};
 
-        res["location"] = this.elements["location"].value;
+        res["origin"] = this.elements["location"].value;
         res["destination"] = this.elements["destination"].value;
 
         
@@ -399,7 +410,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         res["arrivalTimeUtc"] = arrivalTime.toUTCString();
         
         //get the transport method
-        res["transportMode"] = this.getRadioValue("transport-mode");
+        res["travelMode"] = this.getRadioValue("transport-mode");
 
         //get the expert mode
         res["expertMode"] = this.getRadioValue("expert-mode") == 'true';
@@ -465,7 +476,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     {
         if(result.error){
             this.log("result error!");
-            this.setStatus(false);
+            this.setSubmitStatus(false);
             this.displayError(result.error.message);
             this.setPage(2);
         }
@@ -492,7 +503,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
             }else if(req.status >= 400){
                 console.error("error calling backend! Status code:" + req.status);
                 this.dir(req.response);
-                this.setStatus(false);
+                this.setSubmitStatus(false);
                 this.setPage(2);
             }
         }.bind(me);
@@ -518,7 +529,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
             this.submitRequest(startRequest);
         }else {
             console.error("failed to capture payment.");
-            this.setStatus(false);
+            this.setSubmitStatus(false);
         }
     }
 
@@ -535,7 +546,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     {
         if(result.error){
             this.displayError("Error authorizing payment");
-            this.setStatus(false);
+            this.setSubmitStatus(false);
         }else{
             startRequest["paymentIntentId"] = result.paymentIntent.id;
             this.submitRequest(startRequest);
@@ -566,39 +577,42 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     // STEP 11: Get the results. Display error or start the timer!
     PuncCore.prototype.submitRequestCallback = function(req)
     {
-        console.log("submit to server callback");
+        this.log("submit to server callback");
         var res = JSON.parse(req.response);
+        this.setSubmitStatus(false);
 
         if(req.status === 200)
         {
-            console.log("req status is 200");
-            console.dir(this);
+            this.log("req status is 200");
+            this.dir(res);
             window.history.pushState(null, '', '?tid='+res.id);
 
             //set the timer
             this.timer = res;
-            this.setTimerState();     
+            this.populateJourneyInformation();
+            this.setTimerState(this.timer.status);     
         }else{
-            this.setStatus(false);
             this.setPage(1);
             this.displayError(res.error == null ? "Unknown error" : res.error);
         }
     }
 
-
-    /// Start the timer
-    PuncCore.prototype.startLeaveTimer = function(timer)
+    //load the journey details
+    PuncCore.prototype.populateJourneyInformation = function()
     {
-
-        this.elements["form"].className = this.elements["form"].className + " timer-active";
-
         //set journey information
         this.elements["journey-duration"].textContent = Math.floor(this.timer.travelDuration/60) + "mins";
-        this.elements["departure-time"].textContent = this.getTimeFromUnixEpoch(timer.departureTimeEpoch);
-        this.elements["arrival-time"].textContent = this.getTimeFromUnixEpoch(timer.estimatedArrivalTimeEpoch);
+        this.elements["departure-time"].textContent = this.getTimeFromUnixEpoch(this.timer.departureTimeEpoch);
+        this.elements["arrival-time"].textContent = this.getTimeFromUnixEpoch(this.timer.estimatedArrivalTimeEpoch);
 
-        this.elements["journey-origin"].textContent = timer.location;
-        this.elements["journey-destination"].textContent = timer.destination;
+        this.elements["journey-origin"].textContent = this.timer.origin;
+        this.elements["journey-destination"].textContent = this.timer.destination;
+    }
+
+    /// Start the timer
+    PuncCore.prototype.startLeaveTimer = function()
+    {
+        this.clearUpdateTimer();
         
         //set interval to continue updating timer
         var me = this;
@@ -625,10 +639,11 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
     PuncCore.prototype.startJourneyTimer = function()
     {
-        console.log("starting journey");
+        this.clearUpdateTimer();
+        this.log("starting journey");
 
         var me = this;
-        this.updateTimer = window.setInterval(this.updateTimer.bind(me),1000);
+        this.updateTimer = window.setInterval(this.updateJourneyTimer.bind(me),1000);
     }
 
     PuncCore.prototype.updateJourneyTimer = function()
@@ -646,10 +661,15 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
     PuncCore.prototype.startAwaitConfirmation = function()
     {
-        var me = that;
-        this.updateTimer = window.setInterval(function(){this.loadTimer(this.timer.id);}.bind(me),1000);
+        this.clearUpdateTimer();
+        var me = this;
+        this.updateTimer = window.setInterval(function(){this.loadTimer(this.timer.id);}.bind(me),10000);
     }
 
+
+    PuncCore.prototype.openTimerWidget = function(){
+        
+    }
     //update status of timer
     // possible states are:
     // Active
@@ -660,10 +680,11 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     // Late
     // Cancelled
     // Failed
-
     PuncCore.prototype.setTimerState = function(status)
     {
+        this.log("Setting function state as " + status);
         if(this.state === status){
+            this.log("new status is same as old state, returning");
             return;
         }
         this.state = status;
@@ -672,45 +693,76 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         var classname = "";
         var title = "";
         switch(status){
+            case "None":
+                this.log("State none");
+                this.setPage(1);
+                classname = "";
+                break;
+            case "Submitting":
+                this.log("State submitting");
+                this.setPage(3);
+                break;
             case "Active":
-                className = "active";
+                this.setPage(4);
+                this.log("State active");
                 title = "Leave By";
                 this.startLeaveTimer();
                 break;
             case "TimeToLeave":
+                this.log("State TimeToLeave");
+                this.setPage(4);
                 classname = "almost";
                 title = "Leave By";
+                this.startLeaveTimer();
                 break;
             case "Enroute":
+                this.log("State enroute");
+                this.setPage(4);
                 classname = "enroute";
                 title = "Arrive by";
                 this.startJourneyTimer();
                 break;
             case "AwaitingConfirmation":
-                break;
+                this.log("Awaiting confirmation");
+                this.setPage(4);
                 classname = "";
-                title = "Leave Before";
+                title = "Awaiting Confirmation...";
                 this.startAwaitConfirmation();
                 break;
             case "OnTime":
+                this.log("user confirmed as ontime");
+                this.setPage(4);
                 classname = "ontime";
                 title = "You made it";
                 break;
             case "Late":
+                this.log("User confirmed as late");
+                this.setPage(4);
                 classname = "late";
                 title = "Late by";
                 break;
             default:
+                this.log("Invalid status: " + status);
+                this.setSubmitStatus(false);
+                this.setPage(1);
                 break;
         }
 
         this.elements["body"].className = classname;
         this.elements["timer-title"].textContent = title;
-        
     }
 
     PuncCore.prototype.updateTimerWidget = function(seconds){
         this.elements["timer-container"].textContent = formatTimeRemaingStopwatch(seconds);
+    }
+
+    PuncCore.prototype.clearUpdateTimer = function()
+    {
+        this.log("Clearing update timers");
+
+        if(typeof this.updateTimer != 'undefined' && this.updateTimer != null){
+            window.clearInterval(this.updateTimer);
+        }
     }
 
     // display an error to the user
@@ -825,6 +877,23 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         res += seconds.toString();
 
         return res;
+
+    }
+
+
+
+
+    /*
+     *  Email subscription service
+     */
+    PuncCore.prototype.subscribe = function(event)
+    {
+        //prevent the default event
+        if(event){
+            event.preventDefault();
+        }
+
+        //check if email format correct
 
     }
 

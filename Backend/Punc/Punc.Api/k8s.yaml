@@ -1,0 +1,67 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nowleave-api
+  namespace: nowleave
+  labels:
+    app: nowleave-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nowleave-api
+  template:
+    metadata:
+      labels:
+        app: nowleave-api
+    spec:
+      containers:
+      - name: nowleave-api
+        image: 062126059624.dkr.ecr.us-east-1.amazonaws.com/nowleave-api:20191024.2
+        ports:
+        - containerPort: 80
+        env:
+        - name: GoogleMaps__Geocode__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.googlemaps.geocode.apikey
+              key: apisecret
+        - name: GoogleMaps__AutoComplete__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.googlemaps.autocomplete.apikey
+              key: apisecret
+        - name: GoogleMaps__Directions__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.googlemaps.directions.apikey
+              key: apisecret
+        - name: Recaptcha__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.recaptcha.apikey
+              key: apisecret
+        - name: Stripe__ClientSecret
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.stripe.clientsecret
+              key: apisecret
+        - name: Health__Echo
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.health.echo
+              key: apisecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nowleave-api
+  namespace: nowleave
+spec:
+  selector:
+    app: nowleave-api
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80

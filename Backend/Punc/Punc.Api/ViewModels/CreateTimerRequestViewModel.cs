@@ -23,7 +23,7 @@ namespace Punc.Api.ViewModels
                 res.Add(new ValidationResult("Recaptcha token not provided"));
             }
 
-            if (String.IsNullOrEmpty(this.Location) || this.Location.Length < 10)
+            if (String.IsNullOrEmpty(this.Origin) || this.Origin.Length < 10)
             {
                 res.Add(new ValidationResult("Invalid starting location"));
             }
@@ -45,11 +45,29 @@ namespace Punc.Api.ViewModels
 
             if (this.ExpertMode)
             {
+                //validate payment intent provided
                 if(String.IsNullOrWhiteSpace(this.PaymentIntentId))
                 {
                     res.Add(new ValidationResult("Expert mode requires payment and confirmation!"));
                 }
+
+                //validate customer name provided
+                if (String.IsNullOrWhiteSpace(this.CustomerName))
+                {
+                    res.Add(new ValidationResult("A customer name must be provided in expert mode."));
+                }
+
+                //validate customer email in correct format
+                try
+                {
+                    var _ = new MailAddress(this.CustomerEmail);
+                }
+                catch
+                {
+                    res.Add(new ValidationResult("Invalid customer email."));
+                }
                 
+                //validate confirmation method
                 if(this.ConfirmationMethod == TimerConfirmationMethod.LinkConfirmation)
                 {
                     if (String.IsNullOrEmpty(this.RefereeEmail))

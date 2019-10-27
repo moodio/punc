@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Net.Mail;
 using System.Text;
 
 namespace Punc
@@ -32,6 +33,7 @@ namespace Punc
         None = 0,
         RouteError = 1,
         PaymentError = 2,
+        RefereeEmailSendError = 4,
         ServerError = 128
     }
 
@@ -54,11 +56,6 @@ namespace Punc
         }
 
         /// <summary>
-        /// time required to at destination unix epoch utc time
-        /// </summary>
-        public int ArrivalTimeEpoch { get; set; }
-
-        /// <summary>
         /// Time required to arrive at destination (UTC)
         /// </summary>
         public DateTime ArrivalTimeUtc { get; set; }
@@ -68,15 +65,15 @@ namespace Punc
         /// </summary>
         public TimerConfirmationMethod ConfirmationMethod { get; set; }
 
+
+        public MailAddress CustomerEmail { get; set; }
+
+        public string CustomerName { get; set; }
+
         /// <summary>
         /// Time of the last update of journey time
         /// </summary>
         public DateTime LastUpdate { get; set; }
-
-        /// <summary>
-        /// Starting location
-        /// </summary>
-        public string Location { get; set; }
 
         /// <summary>
         /// Address of the destiation
@@ -86,7 +83,7 @@ namespace Punc
         /// <summary>
         /// Departure time in Epoch (Seconds/UTC)
         /// </summary>
-        public int DepartureTimeEpoch { get; set; }
+        public DateTime DepartureTimeUtc { get; set; }
 
         /// <summary>
         /// Estimated arrival time based on route
@@ -94,19 +91,24 @@ namespace Punc
         public DateTime EstimatedArrivalTimeUtc { get; set; }
 
         /// <summary>
-        /// Estimated arrival in unix time epoch
-        /// </summary>
-        public int EstimatedArrivalTimeEpoch { get; set; }
-
-        /// <summary>
         /// Bool for if expert mode is selected
         /// </summary>
         public bool ExpertMode { get; set; } = false;
 
         /// <summary>
+        /// Starting location
+        /// </summary>
+        public string Origin { get; set; }
+
+        /// <summary>
+        /// Email address of the referee
+        /// </summary>
+        public MailAddress RefereeEmail { get; set; }
+
+        /// <summary>
         /// Transport method to arrive to destination
         /// </summary>
-        public TravelMode TransportMethod { get; set; }
+        public TravelMode TravelMode { get; set; }
 
         /// <summary>
         /// Distance in meters of journey
@@ -123,16 +125,12 @@ namespace Punc
         /// </summary>
         public string PaymentIntentId { get; set; }
 
-
         /// <summary>
         /// List of errors if timer has failed
         /// </summary>
         public TimerErrors Errors { get; set; } = TimerErrors.None;
 
-
-
         private TimerStatus _status;
-
         private TimerStatus GetStatus()
         {
             //only update if currently within an active state
@@ -142,11 +140,11 @@ namespace Punc
                 {
                     _status = TimerStatus.AwaitingConfirmation;
                 }
-                else if (DateTimeExtensions.UnixEpochToDateTimeUtc(this.DepartureTimeEpoch) < DateTime.UtcNow)
+                else if (this.DepartureTimeUtc < DateTime.UtcNow)
                 {
                     _status = TimerStatus.Enroute;
                 }
-                else if (DateTimeExtensions.UnixEpochToDateTimeUtc(this.DepartureTimeEpoch) - leaveTimeBuffer < DateTime.UtcNow)
+                else if (this.DepartureTimeUtc - leaveTimeBuffer < DateTime.UtcNow)
                 {
                     _status = TimerStatus.TimeToLeave;
                 }
