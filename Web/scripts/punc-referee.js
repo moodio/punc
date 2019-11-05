@@ -96,6 +96,7 @@ moodio.punc.refereeEndpoint = "/api/referee/timer";
 
         if(this.presetOnTime != null){
             console.log("Preset ontime: " + this.presetOnTime.toString());
+            this.submitOntime(this.presetOnTime);
         }else{
             this.updateState();
         }

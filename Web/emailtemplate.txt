@@ -363,6 +363,7 @@
 
                         <br><br><h3>Why are you getting this email?</h3>
                         <p>This email is sent on behalf of #{CustomerName}# who has selected you as their On-Time referee on <a href='#{LinkHomepage}#'>NowLeave.</a>.</p>
+                        <p>If you do not wish to be emailed anymore, click <a href='#{LinkUnsubscribe}#'>here to unsubscribe</a></p>
                         
                         <br><br><h3>What is NowLeave?</h3>
                         <p><a href='#{LinkHomepage}#'>NowLeave.</a> is a simple app used to help you get to where you need to be on time. Using our website (and our iOS and Android apps in the near future) you select where you need to be and what time, and we'll help you leave on time.</p>

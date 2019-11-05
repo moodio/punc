@@ -15,8 +15,9 @@ moodio.punc = moodio.punc || {};
 moodio.punc.apiHost = "https://localhost:5001";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
+moodio.punc.subscribeEndpoint = "/api/subscriptions/subscribe";
 moodio.punc.recaptchaSiteId = "6LeGabIUAAAAAEThhGHi7_NZYL_cEg1A4fRBSeXH";
-moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
+moodio.punc.stripeKey = "pk_test_W92U2cuHWUIxD4D75MlCXI4m00IgXXLyvV";
 
 (function(){
     
@@ -122,7 +123,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         this.elements["page-back"].addEventListener('click', function(){this.setPage(this.currentPage - 1)}.bind(me));
 
         //attach elements for subscribe
-        this.elements["subscribe-email"].addEventListener('click', this.subscribe.bind(me));
+        this.elements["subscribe-submit"].addEventListener('click', this.subscribe.bind(me));
 
         //setup timer to 2 hours from now
         this.setDefaultTime();
@@ -605,6 +606,9 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
         this.elements["journey-origin"].textContent = this.timer.origin;
         this.elements["journey-destination"].textContent = this.timer.destination;
+
+        //fillout email
+        this.elements["subscribe-email"].value = this.elements["customer-email"].value;
     }
 
     /// Start the timer
@@ -889,7 +893,35 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         }
 
         //check if email format correct
+        email = this.elements["subscribe-email"].value;
+        
+                
+        var re = /\S+@\S+\.\S+/;
+        if(!re.test(email)){
+            this.elements['subscribe-email'].className = this.elements['subscribe-email'].className.replace('error','') + ' error';
+            return;
+        }
 
+        //remove error from subscribe elemenet if it exists
+        this.elements['subscribe-email'].className = this.elements['subscribe-email'].className.replace('error', '');
+
+        //format the url
+        this.log("subscribing");
+        var url = moodio.punc.apiHost + moodio.punc.subscribeEndpoint + '?email=' + email;
+
+        var me = this;
+
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+            if(req.readyState === 4){
+                this.elements['subscribe-submit'].value = "Thanks for Subscribing!";
+                this.elements["subscribe-submit"].disabled = true;
+            }
+        }.bind(me);
+
+        req.open("POST",url);
+        req.setRequestHeader("content-type", "application/json");
+        req.send();
     }
 
     //Logging

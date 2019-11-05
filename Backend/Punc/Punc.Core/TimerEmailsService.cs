@@ -53,13 +53,17 @@ namespace Punc
 
             //links template and variables
             var linkTemplate = _config["Email:Templates:Referee:LinkConfirmationTemplate"];
+            var unsubLinkTemplate = _config["Email:Templates:Referee:LinkUnsubscribe"];
+
             var linkVars = new Dictionary<string, string>()
             {
                 ["TimerId"] = timer.Id.ToString(),
                 ["ConfirmationCode"] = confirmationCode,
-                ["OnTimeValue"] = "true"
+                ["OnTimeValue"] = "true",
+                ["RefereeEmail"] = timer.RefereeEmail.Address
             };
             var ontimeLink = EmailTemplateEngine.ReplaceTokens(linkTemplate, linkVars);
+            var unsubscribeLink = EmailTemplateEngine.ReplaceTokens(unsubLinkTemplate, linkVars);
 
             //create late link
             linkVars["OnTimeValue"] = "false";
@@ -72,6 +76,7 @@ namespace Punc
                 ["LinkOnTime"] = ontimeLink,
                 ["LinkLate"] = lateLink,
                 ["LinkHomepage"] = _config["Email:Templates:Referee:LinkHomepage"],
+                ["LinkUnsubscribe"] = unsubscribeLink,
                 ["CustomerName"] = timer.CustomerName
             };
 

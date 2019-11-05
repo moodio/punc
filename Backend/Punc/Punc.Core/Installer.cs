@@ -19,6 +19,8 @@ namespace Punc
             service.AddScoped<ITimersRepository, TimersRepository>();
             service.AddScoped<IRefereeCodesRepository, RefereeCodesRepository>();
             service.AddScoped<ITimerEmailsService, TimerEmailsService>();
+            service.AddScoped<ISubscribersRepository, SubscribersRepository>();
+            service.AddScoped<ISubscribersService, SubscribersService>();
 
             return service;
         }
