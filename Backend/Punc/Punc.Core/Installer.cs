@@ -11,7 +11,14 @@ namespace Punc
     {
         public static IServiceCollection AddPuncServices(this IServiceCollection service)
         {
+            
+            service.AddScoped<StripeService, StripeService>();
+            service.AddScoped<ITimersService, TimersService>();
+            service.AddScoped<IRefereeCodesService, RefereeCodesService>();
+            service.AddScoped<IEmailService, AwsEmailService>();
             service.AddScoped<ITimersRepository, TimersRepository>();
+            service.AddScoped<IRefereeCodesRepository, RefereeCodesRepository>();
+            service.AddScoped<ITimerEmailsService, TimerEmailsService>();
 
             return service;
         }

@@ -50,10 +50,6 @@ namespace Punc.Api
             services.AddHttpClient<IGeocodingService, GoogleMapsGeocodingService>();
             services.AddHttpClient<RecaptchaVerifyService, RecaptchaVerifyService>();
             services.AddHttpClient<IRouteService, GoogleMapsDirectionsService>();
-            services.AddScoped<StripeService, StripeService>();
-            services.AddScoped<ITimersService, TimersService>();
-            services.AddScoped<IConfirmationService, ConfirmationService>();
-            services.AddScoped<IEmailService, AwsEmailService>();
             services.AddPuncServices();
 
         }

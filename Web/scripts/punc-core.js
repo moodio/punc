@@ -1,12 +1,9 @@
 /*
  * TODO: 
  * Save id of timer in local storage
- * Add logic to retrieve timer on reload
- * add backend logic to email referee
  * Add email signup for updates on real muljin
  * add update gps location button in timer
  * Add sound notification on you're late
- * add time to leave, 5 minutes before actual leave time
  * Add privacy statement and T&C
 */
 
@@ -427,6 +424,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
 
             //get the customer name
             res["customerName"] = this.elements["customer-name"].value;
+            res["customerEmail"] = this.elements["customer-email"].value;
         }
 
         this.dir(res);
@@ -465,7 +463,7 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
     // STEP 4: Create the payment token
     PuncCore.prototype.createPaymentMethod = function(startRequest)
     {
-        var options = {billing_details: {name: this.elements["customer-name"].value}};
+        var options = {billing_details: {name: this.elements["customer-name"].value, email: this.elements["customer-email"].value}};
         
         var me = this;
         this.stripe.createPaymentMethod('card', this.stripeCard, options).then( function(result){ this.createPaymentMethodCallback(result, startRequest);}.bind(me) );
@@ -735,11 +733,11 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
                 classname = "ontime";
                 title = "You made it";
                 break;
-            case "Late":
+            case "ConfirmedLate":
                 this.log("User confirmed as late");
                 this.setPage(4);
                 classname = "late";
-                title = "Late by";
+                title = "You've been confirmed LATE!";
                 break;
             default:
                 this.log("Invalid status: " + status);
@@ -879,9 +877,6 @@ moodio.punc.stripeKey = "pk_test_kXIE0Ku9iDwdXCN5F1QvqK6k005nRrDLdB";
         return res;
 
     }
-
-
-
 
     /*
      *  Email subscription service

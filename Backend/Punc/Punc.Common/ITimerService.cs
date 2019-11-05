@@ -8,8 +8,13 @@ namespace Punc
 {
     public interface ITimersService
     {
+        Task<bool> ConfirmTimerOnTimeStatusAsync(string refereeCode, bool onTime);
+
         Task<Timer> CreateTimerAsync(CreateTimerRequest req);
 
+        Task<RefereeTimer> GetRefereeTimerAsync(string refereeCode);
+
         Task<Timer> GetTimerAsync(Guid id);
+
     }
 }

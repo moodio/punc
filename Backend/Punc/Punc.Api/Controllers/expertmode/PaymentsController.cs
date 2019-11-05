@@ -20,7 +20,7 @@ namespace Punc.Api.Controllers.expertmode
         [HttpPost("authorize")]
         public async Task<IActionResult> AuthorizePayment([FromBody]string paymentMethodId)
         {
-            var res = await _stripeService.CreatePaymentIntent(paymentMethodId);
+            var res = await _stripeService.CreatePaymentIntentAsync(paymentMethodId);
             return new OkObjectResult(res);
         }
     }

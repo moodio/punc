@@ -31,6 +31,10 @@ body, html {
   width: 100%;
   font-family: Helvetica, Arial, sans-serif; }
 
+p {
+  font-size: 0.9rem;
+  color: #444; }
+
 #page-body {
   flex: 1 0 auto; }
 
@@ -70,6 +74,9 @@ body, html {
   font-size: 2rem;
   font-weight: bolder;
   vertical-align: top; }
+  #logo-container a {
+    text-decoration: none;
+    color: inherit; }
 
 #bymoodio-container {
   display: inline-block;
@@ -124,12 +131,17 @@ body, html {
   padding: 20px 20px 0 20px;
   left: 0px;
   transition: left 0.5s; }
+  .form-page.padded {
+    padding: 40px 40px; }
 
 .page2 > #widget-pages > .form-page {
   left: -358px; }
 
 .page3 > #widget-pages > .form-page {
   left: -716px; }
+
+.page4 > #widget-pages > .form-page {
+  left: -1074px; }
 
 .bottom-bar {
   padding: 0px 20px 20px; }
@@ -366,6 +378,21 @@ input[type="email"]--placeholder {
   padding-bottom: 4px; }
 
 /*
+* buttons
+*/
+button {
+  height: 42px;
+  width: 100%;
+  border: none;
+  transition: all 0.4s; }
+  button.default {
+    background-color: #bba44a;
+    color: #F1F1F1; }
+  button.danger {
+    background-color: #bc1a1a;
+    color: #F1F1F1; }
+
+/*
 *   ADD ON BUTTONS
 */
 .addon-button {
@@ -590,6 +617,18 @@ input[type="radio"]:checked + label.danger {
 
 .loading-icon > *:nth-child(5) {
   animation-delay: 0.35s; }
+
+/*
+*   Referee portal stuff
+*/
+.referee-error-title {
+  text-align: center; }
+
+.referee-icon {
+  text-align: center;
+  width: 100%;
+  font-size: 3.5rem;
+  margin-bottom: 40px; }
 
 /*
  *

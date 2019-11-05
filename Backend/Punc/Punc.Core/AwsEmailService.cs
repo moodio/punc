@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon;
+using Amazon.Runtime;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +24,10 @@ namespace Punc
         public async Task<bool> SendEmail(MailMessage email)
         {
             var accessKey = _config["AWS:SES:AccessKeyId"];
+            var secret = _config["AWS:SES:AccessKeySecret"];
+            var creds = new BasicAWSCredentials(accessKey, secret);
 
-            using (var client = new AmazonSimpleEmailServiceClient(RegionEndpoint.USEast1))
+            using (var client = new AmazonSimpleEmailServiceClient(creds,RegionEndpoint.USEast1))
             {
                 var req = new SendEmailRequest()
                 {
@@ -41,7 +44,7 @@ namespace Punc
                     var response = await client.SendEmailAsync(req);
                     return true;
                 }
-                catch
+                catch (Exception e)
                 {
                     return false;
                 }

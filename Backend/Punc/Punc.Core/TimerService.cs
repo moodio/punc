@@ -11,22 +11,71 @@ namespace Punc
 {
     public class TimersService : ITimersService
     {
-        private readonly IConfirmationService _confirmationService;
+        private readonly IRefereeCodesService _refereeCodesService;
         private readonly IRouteService _routeService;
         private readonly StripeService _stripeService;
+        private readonly ITimerEmailsService _timerEmailsService;
         private readonly ITimersRepository _repository;
 
         public TimersService(
-            IConfirmationService confirmationService,
+            IRefereeCodesService refereeCodesService,
+            ITimerEmailsService timerEmailsService,
             IRouteService routeService, 
             ITimersRepository repository,
-            StripeService stripeService
-            )
+            StripeService stripeService)
         {
-            _confirmationService = confirmationService;
+            _refereeCodesService = refereeCodesService;
             _repository = repository;
             _routeService = routeService;
             _stripeService = stripeService;
+            _timerEmailsService = timerEmailsService;
+        }
+
+        public async Task<bool> ConfirmTimerOnTimeStatusAsync(string refereeCode, bool onTime)
+        {
+            //get timer by code
+            var timer = await GetTimerByRefereeCode(refereeCode);
+
+
+            if (timer == null 
+                || timer.Status == TimerStatus.Closed
+                || !timer.ExpertMode)
+            {
+                return false;
+            }
+
+            // make sure timer status is valid to be modified
+            if(timer.Status != TimerStatus.Active
+               && timer.Status != TimerStatus.UnconfirmedLate
+               && timer.Status != TimerStatus.AwaitingConfirmation
+               && timer.Status != TimerStatus.Enroute
+               && timer.Status != TimerStatus.TimeToLeave)
+            {
+                return false;
+            }
+
+            //if ontime, return true
+            if (onTime)
+            {
+                //update
+                timer.Status = TimerStatus.OnTime;
+                await _repository.UpdateTimerAsync(timer);
+
+                //release charge
+                var res = await _stripeService.ReleasePaymentIntentAsync(timer.PaymentIntentId);
+                return res;
+            }
+            else
+            {
+                //update
+                timer.Status = TimerStatus.ConfirmedLate;
+                await _repository.UpdateTimerAsync(timer);
+
+                //charge
+                var res = await _stripeService.CapturePaymentIntentAsync(timer.PaymentIntentId, timer.CustomerEmail);
+                return res;
+            }
+
         }
 
         public async Task<Timer> CreateTimerAsync(CreateTimerRequest req)
@@ -67,6 +116,13 @@ namespace Punc
             return res;
         }
 
+        public async Task<RefereeTimer> GetRefereeTimerAsync(string refereeCode)
+        {
+            var timer = await GetTimerByRefereeCode(refereeCode);
+
+            return (RefereeTimer) timer;
+        }
+
         public async Task<Timer> GetTimerAsync(Guid id)
         {
             var timer = await _repository.GetTimerAsync(id);
@@ -78,10 +134,10 @@ namespace Punc
                     && (DateTime.UtcNow - timer.LastUpdateUtc) > TimeSpan.FromMinutes(15))
                 {
                     await GetAndSetRouteInfoAsync(timer);
-                }
 
-                //update the cache
-                await _repository.UpdateTimerAsync(timer);
+                    //update the repo
+                    await _repository.UpdateTimerAsync(timer);
+                }
 
                 return timer;
             }
@@ -91,6 +147,8 @@ namespace Punc
             }
         }
 
+
+
         /// <summary>
         /// Validate expert mode pro
         /// </summary>
@@ -99,7 +157,7 @@ namespace Punc
         /// <returns></returns>
         private async Task<bool> GetAndSetExpertModeProperties(CreateTimerRequest req, Timer timer)
         {
-            var paymentValid = await _stripeService.ValidatePaymentIntent(req.PaymentIntentId);
+            var paymentValid = await _stripeService.ValidatePaymentIntentAsync(req.PaymentIntentId);
             if (!paymentValid)
             {
                 timer.Status = TimerStatus.Failed;
@@ -118,7 +176,7 @@ namespace Punc
                 timer.RefereeEmail = new MailAddress(req.RefereeEmail);
 
                 //email referee
-                var emailSuccess = await _confirmationService.SendRefereeEmailAsync(timer);
+                var emailSuccess = await _timerEmailsService.SendRefereeEmailAsync(timer);
                 if (!emailSuccess)
                 {
                     timer.Status = TimerStatus.Failed;
@@ -129,7 +187,6 @@ namespace Punc
 
             return true;
         }
-
        
         /// <summary>
         /// Gets the route information for a request and copies properties to the timer
@@ -153,7 +210,6 @@ namespace Punc
             return await GetAndSetRouteInfoAsync(timer, req.Origin, req.Destination, req.TravelMode,
                 req.ArrivalTimeUtc);
         }
-
 
         /// <summary>
         /// Gets the route information for a request and copies properties to the timer
@@ -192,6 +248,19 @@ namespace Punc
 
             //return success
             return true;
+        }
+
+        private async Task<Timer> GetTimerByRefereeCode(string refereeCode)
+        {
+            if (String.IsNullOrWhiteSpace(refereeCode))
+                return null;
+
+            var timerId = await _refereeCodesService.GetRefereeTimerIdAsync(refereeCode);
+            if (timerId == null)
+                return null;
+
+            var timer = await GetTimerAsync((Guid)timerId);
+            return timer;
         }
     }
 }
