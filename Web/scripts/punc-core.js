@@ -11,13 +11,15 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-// moodio.punc.apiHost = "http://api.nowleave.com";
-moodio.punc.apiHost = "https://localhost:5001";
+moodio.punc.apiHost = "http://api.nowleave.com";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
 moodio.punc.subscribeEndpoint = "/api/subscriptions/subscribe";
 moodio.punc.recaptchaSiteId = "6LeGabIUAAAAAEThhGHi7_NZYL_cEg1A4fRBSeXH";
-moodio.punc.stripeKey = "pk_test_W92U2cuHWUIxD4D75MlCXI4m00IgXXLyvV";
+moodio.punc.stripeKey = "pk_live_sOeN5tuA4GPWQTERjHtVtMDU00CfKwZeS7";
+
+// moodio.punc.apiHost = "https://localhost:5001";
+// moodio.punc.stripeKey = "pk_test_W92U2cuHWUIxD4D75MlCXI4m00IgXXLyvV";
 
 (function(){
     
