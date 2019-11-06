@@ -1,7 +1,8 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-moodio.punc.apiHost = "https://localhost:5001";
+// moodio.punc.apiHost = "https://localhost:5001";
+moodio.punc.apiHost = "http://api.nowleave.com";
 moodio.punc.refereeEndpoint = "/api/referee/timer";
 
 (function(){

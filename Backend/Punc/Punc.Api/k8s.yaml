@@ -51,6 +51,11 @@ spec:
             secretKeyRef:
               name: nowleave.health.echo
               key: apisecret
+        - name: SendGrid__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.sendgrid.apikey 
+              key: apikey
 ---
 apiVersion: v1
 kind: Service

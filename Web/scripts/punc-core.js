@@ -11,7 +11,7 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-//moodio.punc.apiHost = "http://api.nowleave.com";
+// moodio.punc.apiHost = "http://api.nowleave.com";
 moodio.punc.apiHost = "https://localhost:5001";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
