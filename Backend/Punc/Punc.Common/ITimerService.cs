@@ -15,6 +15,5 @@ namespace Punc
         Task<RefereeTimer> GetRefereeTimerAsync(string refereeCode);
 
         Task<Timer> GetTimerAsync(Guid id);
-
     }
 }
