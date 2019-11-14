@@ -40,14 +40,14 @@ However, please take note of the following:
  - When installing Istio, ensure that SDS is enabled and SDS is enabled, however that mTLS is DISABLED. A helm installation yaml will be added shortly however it's currently unavailable. Details on how to do this can be found on the istio website in anycase.
 
 Things you will need to setup to get it all running:
-1 - A Kubernetes cluster
-2 - Istio on the kubernetes cluster
-3 - A Postgresql database
-4 - An AWS SES account or alternatively a SendGrid account. To use sendgrid just switch around the services in the Punc.Api startup file. (i.e. change line 18 in punc/Backend/Punc/Punc.Core/Installer.cs to be service.AddScoped<IEmailService, SendGridEmailService>(); and ensure the api key is stored in SendGrid__ApiKey environment variable (SendGrid:ApiKey in the IConfiguration key).
-5 - A Stripe account
-6 - A google developer accounts and access keys for Autocomplete, Directions, Geocoding and Recaptcha
-7 - A docker repository.
-8 - Once kubernetes is installed, run punc/Backend/Punc/Punc.Api/createsecrets.sh and fill out all your api keys so that they are stored in kubernetes and can be retrieved by the pods.
-9 - To deploy to kubernetes, apply the configuration file punc/Backend/Punc/Punc.Api/k8s.yaml replacing the name of the docker image with your own.
+1. A Kubernetes cluster
+2. Istio on the kubernetes cluster
+3. A Postgresql database
+4. An AWS SES account or alternatively a SendGrid account. To use sendgrid just switch around the services in the Punc.Api startup file. (i.e. change line 18 in punc/Backend/Punc/Punc.Core/Installer.cs to be service.AddScoped<IEmailService, SendGridEmailService>(); and ensure the api key is stored in SendGrid__ApiKey environment variable (SendGrid:ApiKey in the IConfiguration key).
+5. A Stripe account
+6. A google developer accounts and access keys for Autocomplete, Directions, Geocoding and Recaptcha
+7. A docker repository.
+8. Once kubernetes is installed, run punc/Backend/Punc/Punc.Api/createsecrets.sh and fill out all your api keys so that they are stored in kubernetes and can be retrieved by the pods.
+9. To deploy to kubernetes, apply the configuration file punc/Backend/Punc/Punc.Api/k8s.yaml replacing the name of the docker image with your own.
 
 The above steps are just summaries of what needs to be done, and are far more involved. So again please consult the websites referenced above and the documents for your own cloud provider. But if anything is missing or wrong please raise an issue!
