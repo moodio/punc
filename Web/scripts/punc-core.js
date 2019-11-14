@@ -11,7 +11,7 @@
 var moodio = moodio || {};
 moodio.punc = moodio.punc || {};
 
-moodio.punc.apiHost = "http://api.nowleave.com";
+moodio.punc.apiHost = "https://api.nowleave.com";
 moodio.punc.capturePaymentEndpoint = "/api/expertmode/payments/authorize";
 moodio.punc.startTimer = "/api/timers";
 moodio.punc.subscribeEndpoint = "/api/subscriptions/subscribe";
@@ -261,6 +261,9 @@ moodio.punc.stripeKey = "pk_live_sOeN5tuA4GPWQTERjHtVtMDU00CfKwZeS7";
 
         if(this.expertMode && this.currentPage === 1)
         {
+            console.log('is expert mode and page 1');
+
+            console.log('its expert mode');
             if(this.validateForm(1)){
                 this.setPage(2);
             }
@@ -269,6 +272,7 @@ moodio.punc.stripeKey = "pk_live_sOeN5tuA4GPWQTERjHtVtMDU00CfKwZeS7";
 
         //validate final form
         if(!this.validateForm()){
+            console.log('final form, not valid');
             return;
         }
 
@@ -579,22 +583,30 @@ moodio.punc.stripeKey = "pk_live_sOeN5tuA4GPWQTERjHtVtMDU00CfKwZeS7";
     PuncCore.prototype.submitRequestCallback = function(req)
     {
         this.log("submit to server callback");
-        var res = JSON.parse(req.response);
+        
         this.setSubmitStatus(false);
 
-        if(req.status === 200)
-        {
-            this.log("req status is 200");
-            this.dir(res);
-            window.history.pushState(null, '', '?tid='+res.id);
+        try{
+            var res = JSON.parse(req.response);
+        
+            if(req.status === 200)
+            {
+                var res = JSON.parse(req.response);
+                this.log("req status is 200");
+                this.dir(res);
+                window.history.pushState(null, '', '?tid='+res.id);
 
-            //set the timer
-            this.timer = res;
-            this.populateJourneyInformation();
-            this.setTimerState(this.timer.status);     
-        }else{
+                //set the timer
+                this.timer = res;
+                this.populateJourneyInformation();
+                this.setTimerState(this.timer.status);     
+            }else{
+                this.setPage(1);
+                this.displayError(res.error == null ? "Unknown error" : res.error);
+            }
+        } catch{
             this.setPage(1);
-            this.displayError(res.error == null ? "Unknown error" : res.error);
+            this.displayError('Sorry there\'s been a server error. Please try again');
         }
     }
 
@@ -822,7 +834,7 @@ moodio.punc.stripeKey = "pk_live_sOeN5tuA4GPWQTERjHtVtMDU00CfKwZeS7";
             }
         }
 
-        if(typeof page === 'undefined' || page == 2)
+        if((typeof page === 'undefined' || page === 2) && this.expertMode) 
         {
             if(this.confirmationMethod == "LinkConfirmation"){
                 var email = this.elements["referee-email"].value;

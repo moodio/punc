@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nowleave-api
-        image: 062126059624.dkr.ecr.us-east-1.amazonaws.com/nowleave-api:20191024.2
+        image: 062126059624.dkr.ecr.us-east-1.amazonaws.com/nowleave-api:20191106.2
         ports:
         - containerPort: 80
         env:
@@ -51,11 +51,21 @@ spec:
             secretKeyRef:
               name: nowleave.health.echo
               key: apisecret
+        - name: AWS_SES_AccessKeySecret
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.aws.ses.accesskey
+              key: secret
         - name: SendGrid__ApiKey
           valueFrom:
             secretKeyRef:
               name: nowleave.sendgrid.apikey 
               key: apikey
+        - name: Database__ConnectionString
+          valueFrom:
+            secretKeyRef:
+              name: nowleave.database.connectionstring 
+              key: connectionstring
 ---
 apiVersion: v1
 kind: Service
@@ -70,3 +80,23 @@ spec:
     protocol: TCP
     port: 80
     targetPort: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: nowleave-api
+  namespace: nowleave
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - nowleave-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api
+    route:
+    - destination:
+        port:
+          number: 80
+        host: nowleave-api

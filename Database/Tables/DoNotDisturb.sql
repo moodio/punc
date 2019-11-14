@@ -5,3 +5,9 @@ CREATE TABLE do_not_disturb(
 
 SELECT * FROM subscribers;
 SELECT * FROM do_not_disturb;
+
+SELECT * FROM timers;
+
+SELECT * FROM subscribers;
+
+SELECT * FROM timers;

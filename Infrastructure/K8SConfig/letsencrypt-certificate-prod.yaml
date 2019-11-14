@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: ingress-cert-api
+  namespace: istio-system
+spec:
+  secretName: ingress-cert-api
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  commonName: 'nowleave.com'
+  dnsNames:
+  - api.nowleave.com
+  - nowleave.com
